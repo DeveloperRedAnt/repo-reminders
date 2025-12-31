@@ -17,19 +17,19 @@ jobs:
       - name: Set Timezone & Message
         id: message
         run: |
-          HOUR=$(TZ="Asia/Jakarta" date +%H)
-          
-          if [ "$HOUR" == "09" ]; then
+          HOUR=$(TZ="Asia/Jakarta" date +%-H)
+
+          if [ "$HOUR" -ge 7 ] && [ "$HOUR" -le 10 ]; then
             TITLE="☀️ Selamat Pagi, Ants!"
-            DESC="Jangan lupa **absen masuk** ya! Semangat bekerja hari ini 🐜💪"
+            DESC="Jangan lupa **absen masuk** ya! Semangat WFH hari ini 🐜💪\n\n📋 [Isi Absen Di Sini](https://forms.gle/HcoB8X4gF4wEAyLKA)"
             COLOR=15158332
-          elif [ "$HOUR" == "12" ]; then
+          elif [ "$HOUR" -ge 11 ] && [ "$HOUR" -le 13 ]; then
             TITLE="🍽️ Waktunya Istirahat!"
-            DESC="Sudah absen istirahat? Jangan lupa makan siang dan recharge energi 🔋"
+            DESC="Sudah absen istirahat? Jangan lupa makan siang dan recharge energi 🔋\n\n📋 [Isi Absen Di Sini](https://forms.gle/HcoB8X4gF4wEAyLKA)"
             COLOR=15844367
-          else
-            TITLE="🏠 Waktunya Pulang!"
-            DESC="Jangan lupa **absen pulang** sebelum pulang. Sampai jumpa besok! 👋🐜"
+          elif [ "$HOUR" -ge 16 ]; then
+            TITLE="🐜 Reminder Sore, Ants!"
+            DESC="Jangan lupa **absen sore** ya! 👋\n\n📋 [Isi Absen Di Sini](https://forms.gle/HcoB8X4gF4wEAyLKA)"
             COLOR=10181046
           fi
           
