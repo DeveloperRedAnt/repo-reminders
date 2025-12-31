@@ -1,0 +1,57 @@
+name: Reminder Absen
+
+on:
+  schedule:
+    # Jam 9 pagi WIB (02:00 UTC)
+    - cron: '0 2 * * 1-5'
+    # Jam 12 siang WIB (05:00 UTC)
+    - cron: '0 5 * * 1-5'
+    # Jam 4 sore WIB (09:00 UTC)
+    - cron: '0 9 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set Timezone & Message
+        id: message
+        run: |
+          HOUR=$(TZ="Asia/Jakarta" date +%H)
+          
+          if [ "$HOUR" == "09" ]; then
+            TITLE="☀️ Selamat Pagi, Ants!"
+            DESC="Jangan lupa **absen masuk** ya! Semangat bekerja hari ini 🐜💪"
+            COLOR=15158332
+          elif [ "$HOUR" == "12" ]; then
+            TITLE="🍽️ Waktunya Istirahat!"
+            DESC="Sudah absen istirahat? Jangan lupa makan siang dan recharge energi 🔋"
+            COLOR=15844367
+          else
+            TITLE="🏠 Waktunya Pulang!"
+            DESC="Jangan lupa **absen pulang** sebelum pulang. Sampai jumpa besok! 👋🐜"
+            COLOR=10181046
+          fi
+          
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+          echo "desc=$DESC" >> $GITHUB_OUTPUT
+          echo "color=$COLOR" >> $GITHUB_OUTPUT
+
+      - name: Send Discord Notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          curl -X POST "$DISCORD_WEBHOOK" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "content": "@everyone",
+              "embeds": [{
+                "title": "${{ steps.message.outputs.title }}",
+                "description": "${{ steps.message.outputs.desc }}",
+                "color": ${{ steps.message.outputs.color }},
+                "footer": {
+                  "text": "🐜 Red Ant Colony • HR Reminder"
+                },
+                "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"
+              }]
+            }'
